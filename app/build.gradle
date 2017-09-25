@@ -1,0 +1,76 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+    defaultConfig {
+        applicationId "org.mautokar.movieapp"
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.mergeResources.doLast {
+            File keyFile = file('../key.txt')
+            if (!keyFile.exists()) {
+                throw new GradleException('Key file does not exist, it should be placed in ' + keyFile.absolutePath
+                + '. This file should contain your API_KEY from https://www.themoviedb.org.')
+            }
+
+            File stringFile = file("${buildDir}/intermediates/res/merged/${variant.dirName}/values/values.xml")
+            if (!stringFile.exists()) {
+                throw new GradleException('Resource file does not exist under path ' + stringFile.absolutePath)
+            }
+
+            String key = keyFile.getText('UTF-8')
+            String content = stringFile.getText('UTF-8')
+            content = content.replaceAll('#API_KEY#', key)
+            stringFile.write(content, 'UTF-8')
+            println("Replacing #API_KEY# with " + key + " in file: " + stringFile.absolutePath)
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.17'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.google.dagger:dagger:2.11'
+    kapt "com.android.databinding:compiler:$gradle_version"
+    kapt 'com.google.dagger:dagger-compiler:2.11'
+    testCompile 'junit:junit:4.12'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+}
+
+repositories {
+    mavenCentral()
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
