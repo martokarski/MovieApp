@@ -18,8 +18,7 @@ class MovieService @Inject constructor(private val app: App, private val service
 
     private val apiKey = app.getString(R.string.api_key)
 
-    val movies: Deferred<List<Movie>>
-        get() = async(CommonPool) {
+    fun retrieveMoviesAsync() = async(CommonPool) {
             var result = emptyList<Movie>()
 
             if (checkInternetConnection()) {

@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() = launch(Android) {
-        val list = movieService.movies.await()
+        val list = movieService.retrieveMoviesAsync().await()
         binding.recycler.adapter = MovieAdapter(list)
 
         dialog.dismiss()
