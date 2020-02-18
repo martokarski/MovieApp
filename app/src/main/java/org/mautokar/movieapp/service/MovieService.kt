@@ -3,9 +3,9 @@ package org.mautokar.movieapp.service
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.mautokar.movieapp.App
 import org.mautokar.movieapp.R
 import org.mautokar.movieapp.model.Movie
@@ -18,7 +18,7 @@ class MovieService @Inject constructor(private val app: App, private val service
 
     private val apiKey = app.getString(R.string.api_key)
 
-    fun retrieveMoviesAsync() = async(CommonPool) {
+    fun retrieveMoviesAsync() = GlobalScope.async(Dispatchers.IO) {
             var result = emptyList<Movie>()
 
             if (checkInternetConnection()) {
